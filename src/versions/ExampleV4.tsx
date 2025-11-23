@@ -1,5 +1,4 @@
 import {
-  forwardRef,
   memo,
   useEffect,
   useLayoutEffect,
@@ -20,14 +19,14 @@ const NumberColumn = memo(({ value }: { value: number }) => {
   const activeTransform = useMemo(() => {
     if (!hasRendered) return `translateY(0)`;
 
-    return `translateY(calc(${value} * -1em))`;
+    return `translateY(calc(${value} * -1.2em))`;
   }, [value, hasRendered]);
 
   return (
     <div
       data-value={value}
       data-transform={activeTransform}
-      className="inline-block relative h-[1em] overflow-hidden"
+      className="inline-block relative h-[1.2em] overflow-hidden"
     >
       <div
         className="flex flex-col text-inherit"
@@ -39,7 +38,7 @@ const NumberColumn = memo(({ value }: { value: number }) => {
         {Array.from({ length: 10 }).map((_, index) => (
           <div
             key={index}
-            className="h-[1em]"
+            className="h-[1.2em] text-center"
             style={{
               userSelect: value === index ? "text" : "none",
             }}
@@ -52,52 +51,28 @@ const NumberColumn = memo(({ value }: { value: number }) => {
   );
 });
 
-const CharacterColumn = ({ char }: { char: string }) => {
-  return <div className="inline-block h-[1em]">{char}</div>;
+const CharacterColumn = ({ children }: { children: React.ReactNode }) => {
+  return <div className="inline-block h-[1.2em]">{children}</div>;
 };
 
-const NumberScroller = forwardRef<HTMLDivElement, { value: number }>(
-  ({ value }, ref) => {
-    const formattedValue = useMemo(
-      () =>
-        new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        }).format(value),
-      [value]
-    );
-
-    const numberColumns = formattedValue.split("").map((char, index) => {
-      if (!isNaN(parseInt(char))) {
-        return <NumberColumn key={index} value={parseInt(char)} />;
-      }
-      return <CharacterColumn key={index} char={char} />;
-    });
-
-    return (
-      <div ref={ref} className="text-[size:inherit] flex items-baseline">
-        {numberColumns}
-      </div>
-    );
-  }
-);
-
-NumberScroller.displayName = "NumberScroller";
-
-const ExampleV3 = () => {
-  const [value, setValue] = useState(3200);
+export const NumberScroller = ({
+  value,
+  className,
+  formatter,
+}: {
+  value: number;
+  className?: string;
+  formatter?: (value: number) => string;
+}) => {
   const lastValueRef = useRef<number | null>(null);
   const textRef = useRef<HTMLDivElement>(null);
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     const randomValue = Math.floor(Math.random() * 2000);
-  //     setValue(randomValue);
-  //   }, 3000);
-  //   return () => clearInterval(interval);
-  // }, [value]);
+  const formattedValue = useMemo(
+    () => (formatter ? formatter(value) : String(value)),
+    [value]
+  );
 
   useLayoutEffect(() => {
     const textElement = textRef.current;
@@ -109,7 +84,7 @@ const ExampleV3 = () => {
       textElement?.classList.add("positive-change");
       timeoutRef.current = setTimeout(() => {
         textElement?.classList.remove("positive-change");
-        textElement?.style.setProperty("transition", "color 500ms ease-out");
+        textElement?.style.setProperty("transition", "color 1500ms ease-out");
         setTimeout(() => {
           textElement?.style.setProperty("transition", "");
         }, 1000);
@@ -118,7 +93,7 @@ const ExampleV3 = () => {
       textElement?.classList.add("negative-change");
       timeoutRef.current = setTimeout(() => {
         textElement?.classList.remove("negative-change");
-        textElement?.style.setProperty("transition", "color 500ms ease-out");
+        textElement?.style.setProperty("transition", "color 1500ms ease-out");
         setTimeout(() => {
           textElement?.style.setProperty("transition", "");
         }, 1000);
@@ -134,11 +109,50 @@ const ExampleV3 = () => {
     };
   }, [value]);
 
+  const numberColumns = formattedValue.split("").map((char, index) => {
+    if (!isNaN(parseInt(char))) {
+      return <NumberColumn key={index} value={parseInt(char)} />;
+    } else if (char === " ") {
+      return <CharacterColumn key={index}>&nbsp;</CharacterColumn>;
+    } else {
+      return <CharacterColumn key={index}>{char}</CharacterColumn>;
+    }
+  });
+
+  return (
+    <div ref={textRef} className={`flex items-baseline ${className}`}>
+      {numberColumns}
+    </div>
+  );
+};
+
+NumberScroller.displayName = "NumberScroller";
+
+const ExampleV4 = () => {
+  const [value, setValue] = useState(320000);
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     const randomValue = Math.floor(Math.random() * 2000);
+  //     setValue(randomValue);
+  //   }, 3000);
+  //   return () => clearInterval(interval);
+  // }, [value]);
+
   return (
     <div className="flex flex-col items-center gap-10">
-      <div className="text-4xl">
-        <NumberScroller ref={textRef} value={value} />
-      </div>
+      <NumberScroller
+        value={value}
+        className="text-4xl"
+        formatter={(val) =>
+          new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            notation: "compact",
+            compactDisplay: "short",
+          }).format(val)
+        }
+      />
       <div className="flex gap-2 items-center">
         <button
           className="rounded-md bg-text/40 px-2 flex items-center"
@@ -154,7 +168,9 @@ const ExampleV3 = () => {
         </button>
         <button
           className="rounded-md bg-text/40 px-2 flex items-center"
-          onClick={() => setValue(Math.floor(Math.random() * 4000) - 2000)}
+          onClick={() =>
+            setValue((prev) => prev + Math.floor(Math.random() * 4000) - 2000)
+          }
         >
           Random
         </button>
@@ -163,4 +179,4 @@ const ExampleV3 = () => {
   );
 };
 
-export default ExampleV3;
+export default ExampleV4;
