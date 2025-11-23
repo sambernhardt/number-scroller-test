@@ -1,10 +1,15 @@
 import ExampleV1 from "./versions/ExampleV1";
+import ExampleV2 from "./versions/ExampleV2";
 
 function App() {
   const examples = [
     {
       title: "Example 1",
       component: <ExampleV1 />,
+    },
+    {
+      title: "Example 2",
+      component: <ExampleV2 />,
     },
   ];
 

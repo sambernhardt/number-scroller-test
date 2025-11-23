@@ -1,11 +1,19 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 
-const ANIMATION_DURATION = 300;
+const ANIMATION_DURATION = 400;
 
 const NumberColumn = memo(({ value }: { value: number }) => {
+  const [hasRendered, setHasRendered] = useState(false);
+
+  useEffect(() => {
+    setHasRendered(true);
+  }, []);
+
   const activeTransform = useMemo(() => {
+    if (!hasRendered) return `translateY(0)`;
+
     return `translateY(calc(${value} * -1em))`;
-  }, [value]);
+  }, [value, hasRendered]);
 
   return (
     <div
@@ -17,13 +25,13 @@ const NumberColumn = memo(({ value }: { value: number }) => {
         className="flex flex-col text-inherit"
         style={{
           transform: activeTransform,
-          transition: `transform ${ANIMATION_DURATION}ms cubic-bezier(.51,1.14,.95,.94)`,
+          transition: `transform ${ANIMATION_DURATION}ms cubic-bezier(.02,1.02,.38,.93)`,
         }}
       >
         {Array.from({ length: 10 }).map((_, index) => (
           <div
             key={index}
-            className="h-[1em] inline-block"
+            className="h-[1em]"
             style={{
               userSelect: value === index ? "text" : "none",
             }}
@@ -57,19 +65,23 @@ const NumberScroller = ({ value }: { value: number }) => {
     return <CharacterColumn key={index} char={char} />;
   });
 
-  return <div className="flex items-baseline">{numberColumns}</div>;
+  return (
+    <div className="text-[size:inherit] flex items-baseline">
+      {numberColumns}
+    </div>
+  );
 };
 
 const ExampleV1 = () => {
   const [value, setValue] = useState(3200);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     const randomValue = Math.floor(Math.random() * 2000);
-  //     setValue(randomValue);
-  //   }, 3000);
-  //   return () => clearInterval(interval);
-  // }, [value]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomValue = Math.floor(Math.random() * 2000);
+      setValue(randomValue);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [value]);
 
   return (
     <div className="flex flex-col items-center gap-10">
@@ -91,7 +103,7 @@ const ExampleV1 = () => {
         </button>
         <button
           className="rounded-md bg-text/40 px-2 flex items-center"
-          onClick={() => setValue(Math.floor(Math.random() * 2000))}
+          onClick={() => setValue(Math.floor(Math.random() * 4000) - 2000)}
         >
           Random
         </button>
