@@ -3,18 +3,21 @@
 :root {
   --color-background: var(--color-neutral-50);
   --color-text: var(--color-neutral-950);
+  --color-border: var(--color-neutral-200);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --color-background: var(--color-neutral-950);
     --color-text: var(--color-neutral-50);
+    --color-border: var(--color-neutral-800);
   }
 }
 
 @theme inline {
   --color-background: var(--color-background);
   --color-text: var(--color-text);
+  --color-border: var(--color-border);
 }
 
 body {
