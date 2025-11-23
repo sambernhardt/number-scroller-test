@@ -72,16 +72,16 @@ const NumberScroller = ({ value }: { value: number }) => {
   );
 };
 
-const ExampleV1 = () => {
+const ExampleV2 = () => {
   const [value, setValue] = useState(3200);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const randomValue = Math.floor(Math.random() * 2000);
-      setValue(randomValue);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [value]);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     const randomValue = Math.floor(Math.random() * 2000);
+  //     setValue(randomValue);
+  //   }, 3000);
+  //   return () => clearInterval(interval);
+  // }, [value]);
 
   return (
     <div className="flex flex-col items-center gap-10">
@@ -112,4 +112,4 @@ const ExampleV1 = () => {
   );
 };
 
-export default ExampleV1;
+export default ExampleV2;

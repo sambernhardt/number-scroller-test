@@ -24,3 +24,11 @@ body {
   background-color: var(--color-background);
   color: var(--color-text);
 }
+
+.negative-change {
+  color: var(--color-red-500);
+}
+
+.positive-change {
+  color: var(--color-green-500);
+}
